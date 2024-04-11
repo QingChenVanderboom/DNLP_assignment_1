@@ -47,7 +47,7 @@ def trigramTfG(tfDic, words):
         tfDic[((words[i], words[i + 1]), words[i + 2])] = tfDic.get(((words[i], words[i + 1]), words[i + 2]), 0) + 1
 
 
-def unigramC(article, count):
+def unigramC(article, count, is_ci=0):
     print("unigramC start")
     before = time.time()
     lineC = 0
@@ -56,16 +56,16 @@ def unigramC(article, count):
     wordsL = 0
 
     for line in article:
-        # for x in jieba.cut(line):
-        #     wordsS.append(x)
-        #     wordsL += 1
-        # wordTf(wordsTf, wordsS)
+        if is_ci:
+            for x in jieba.cut(line):
+                wordsS.append(x)
+                wordsL += 1
+            wordTf(wordsTf, wordsS)
+        else:
+            wordsS = list(line)
+            wordsL = len(wordsS)
 
-        wordsS = list(line)
-        wordsL = len(wordsS)
         wordTf(wordsTf, wordsS)
-
-
         wordsS = []
         lineC += 1
 
@@ -80,7 +80,7 @@ def unigramC(article, count):
     print("Chinese information entropy of unitary model:", round(sum(entropy), 5), "bit/word")
 
 
-def bigramC(article, count):
+def bigramC(article, count, is_ci=0):
     before = time.time()
     wordsS = []
     wordsL = 0
@@ -89,12 +89,14 @@ def bigramC(article, count):
     bigramTf = {}
 
     for line in article:
-        # for x in jieba.cut(line):
-        #     wordsS.append(x)
-        #     wordsL += 1
+        if is_ci:
+            for x in jieba.cut(line):
+                wordsS.append(x)
+                wordsL += 1
+        else:
+            wordsS = list(line)
+            wordsL = len(wordsS)
 
-        wordsS = list(line)
-        wordsL = len(wordsS)
         wordTf(wordsTf, wordsS)
         bigramTfG(bigramTf, wordsS)
 
@@ -116,7 +118,7 @@ def bigramC(article, count):
     print("Chinese information entropy for binary models:", round(sum(entropy), 5), "bit/word")
 
 
-def trigramC(article, count):
+def trigramC(article, count, is_ci=0):
     before1 = time.time()
     wordsS = []
     wordsL = 0
@@ -125,12 +127,13 @@ def trigramC(article, count):
     trigramTf = {}
 
     for line in article:
-        # for x in jieba.cut(line):
-        #     wordsS.append(x)
-        #     wordsL += 1
-
-        wordsS = list(line)
-        wordsL = len(wordsS)
+        if is_ci:
+            for x in jieba.cut(line):
+                wordsS.append(x)
+                wordsL += 1
+        else:
+            wordsS = list(line)
+            wordsL = len(wordsS)
 
         bigramTfG(wordsTf, wordsS)
         trigramTfG(trigramTf, wordsS)
@@ -157,6 +160,6 @@ def trigramC(article, count):
 if __name__ == '__main__':
     tra = TraverF("./data/merge.txt")
     article, count = tra.DirT()
-    unigramC(article, count)
-    bigramC(article, count)
-    trigramC(article, count)
+    unigramC(article, count, is_ci=1)
+    bigramC(article, count, is_ci=1)
+    trigramC(article, count, is_ci=1)
